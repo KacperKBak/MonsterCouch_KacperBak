@@ -1,0 +1,56 @@
+# Unity generated folders (cache, temp data, local settings)
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Mm]emoryCaptures.meta
+
+# Build output
+[Cc]ache/
+[Aa]rtifacts/
+/[Ss]erver[Dd]ata/
+*.apk
+*.aab
+*.unitypackage
+
+# Auto-generated project files
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+
+# IDE and tooling
+.vscode/
+.vs/
+.idea/
+*.sln.iml
+
+# Gradle cache and settings
+.gradle/
+gradle-app.setting
+gradle.properties
+local.properties
+
+# Crashlytics generated files
+crashlytics-build.properties
+crashlytics-build.apk
+fabric.properties
+
+# Miscellaneous
+*.swp
+*.bak
+*.orig
+.DS_Store
+Thumbs.db
+
