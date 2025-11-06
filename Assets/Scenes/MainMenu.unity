@@ -1672,12 +1672,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64c525f3d688c4ee9b39e974eb52d2af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuController
+  gameSceneName: Game
   mainMenu: {fileID: 647559264}
   settingsMenu: {fileID: 1410549641}
-  MainMenuFirstFocus: {fileID: 1617725303}
-  SettingsFirstFocus: {fileID: 1500311140}
-  ExitButton: {fileID: 913545927}
-  EventSystem: {fileID: 471486096}
+  mainMenuFirstFocus: {fileID: 1617725303}
+  settingsFirstFocus: {fileID: 1500311140}
+  exitButton: {fileID: 913545927}
+  eventSystem: {fileID: 471486096}
+  cancelAction: {fileID: 7727032971491509709, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
 --- !u!1 &1516918524
 GameObject:
   m_ObjectHideFlags: 0
@@ -1982,7 +1984,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1617725306}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1506264000}
+        m_TargetAssemblyTypeName: MonsterCouch.UI.MenuController, Assembly-CSharp
+        m_MethodName: PlayButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1617725306
 MonoBehaviour:
   m_ObjectHideFlags: 0
