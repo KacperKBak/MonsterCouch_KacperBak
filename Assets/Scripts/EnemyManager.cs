@@ -42,6 +42,9 @@ namespace MonsterCouch.Gameplay
         private Camera _camera = null!;
         private Vector2 _minBounds;
         private Vector2 _maxBounds;
+        private Vector3 _cachedBottomLeft;
+        private Vector3 _cachedTopRight;
+        private bool _hasBounds;
         private bool _isInitialized;
 
         public void Initialize(PlayerController player, Camera camera)
@@ -70,6 +73,8 @@ namespace MonsterCouch.Gameplay
             {
                 return;
             }
+
+            UpdateBoundsIfNeeded();
 
             Vector3 playerPosition = _player.transform.position;
             float deltaTime = Time.deltaTime;
@@ -108,6 +113,8 @@ namespace MonsterCouch.Gameplay
 
         public void ResetEnemies()
         {
+            UpdateBoundsIfNeeded();
+
             foreach (EnemyAgent enemy in _enemies)
             {
                 if (enemy == null)
@@ -123,6 +130,8 @@ namespace MonsterCouch.Gameplay
 
         private void SpawnEnemiesIfNeeded()
         {
+            UpdateBoundsIfNeeded();
+
             if (enemyPrefab == null)
             {
                 throw new InvalidOperationException("Enemy prefab is not assigned.");
@@ -156,11 +165,7 @@ namespace MonsterCouch.Gameplay
 
         private void CacheBounds()
         {
-            float zOffset = Mathf.Abs(_camera.transform.position.z - transform.position.z);
-            Vector3 bottomLeft = _camera.ViewportToWorldPoint(new Vector3(0f, 0f, zOffset));
-            Vector3 topRight = _camera.ViewportToWorldPoint(new Vector3(1f, 1f, zOffset));
-            _minBounds = new Vector2(bottomLeft.x, bottomLeft.y);
-            _maxBounds = new Vector2(topRight.x, topRight.y);
+            UpdateBoundsIfNeeded();
         }
 
         private Vector2 GetRandomSpawnPosition()
@@ -275,6 +280,53 @@ namespace MonsterCouch.Gameplay
 
             enemy.Velocity = velocity;
             return position;
+        }
+
+        private void UpdateBoundsIfNeeded()
+        {
+            if (_camera == null)
+            {
+                return;
+            }
+
+            float zOffset = Mathf.Abs(_camera.transform.position.z - transform.position.z);
+            Vector3 bottomLeft = _camera.ViewportToWorldPoint(new Vector3(0f, 0f, zOffset));
+            Vector3 topRight = _camera.ViewportToWorldPoint(new Vector3(1f, 1f, zOffset));
+
+            if (_hasBounds &&
+                ApproximatelyEqual(bottomLeft, _cachedBottomLeft) &&
+                ApproximatelyEqual(topRight, _cachedTopRight))
+            {
+                return;
+            }
+
+            _cachedBottomLeft = bottomLeft;
+            _cachedTopRight = topRight;
+            _minBounds = new Vector2(bottomLeft.x, bottomLeft.y);
+            _maxBounds = new Vector2(topRight.x, topRight.y);
+            _hasBounds = true;
+
+            ClampEnemiesToBounds();
+        }
+
+        private void ClampEnemiesToBounds()
+        {
+            foreach (EnemyAgent enemy in _enemies)
+            {
+                if (enemy == null)
+                {
+                    continue;
+                }
+
+                Vector3 pos = enemy.transform.position;
+                Vector2 resolved = ResolveBounds(new Vector2(pos.x, pos.y), enemy);
+                enemy.transform.position = new Vector3(resolved.x, resolved.y, pos.z);
+            }
+        }
+
+        private static bool ApproximatelyEqual(Vector3 a, Vector3 b)
+        {
+            return Vector3.SqrMagnitude(a - b) <= 0.0001f;
         }
     }
 }

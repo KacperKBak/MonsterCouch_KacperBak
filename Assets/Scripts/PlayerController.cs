@@ -21,6 +21,9 @@ namespace MonsterCouch.Gameplay
         private Camera _mainCamera = null!;
         private Vector2 _minBounds;
         private Vector2 _maxBounds;
+        private Vector3 _cachedBottomLeft;
+        private Vector3 _cachedTopRight;
+        private bool _hasBounds;
         private Rigidbody2D _rigidbody = null!;
         private Vector2 _currentInput;
 
@@ -64,6 +67,8 @@ namespace MonsterCouch.Gameplay
                 return;
             }
 
+            UpdateBoundsIfNeeded();
+
             Vector2 input = moveAction != null ? moveAction.action.ReadValue<Vector2>() : Vector2.zero;
             if (input.sqrMagnitude > 1f)
             {
@@ -92,11 +97,7 @@ namespace MonsterCouch.Gameplay
 
         private void CacheBounds()
         {
-            float zOffset = Mathf.Abs(_mainCamera.transform.position.z - transform.position.z);
-            Vector3 bottomLeft = _mainCamera.ViewportToWorldPoint(new Vector3(0f, 0f, zOffset));
-            Vector3 topRight = _mainCamera.ViewportToWorldPoint(new Vector3(1f, 1f, zOffset));
-            _minBounds = new Vector2(bottomLeft.x, bottomLeft.y);
-            _maxBounds = new Vector2(topRight.x, topRight.y);
+            UpdateBoundsIfNeeded();
         }
 
         private Vector2 ClampToScreenBounds(Vector2 position)
@@ -131,6 +132,36 @@ namespace MonsterCouch.Gameplay
 
             enemy = source.GetComponentInChildren<EnemyAgent>();
             return enemy != null;
+        }
+
+        private void UpdateBoundsIfNeeded()
+        {
+            if (_mainCamera == null)
+            {
+                return;
+            }
+
+            float zOffset = Mathf.Abs(_mainCamera.transform.position.z - transform.position.z);
+            Vector3 bottomLeft = _mainCamera.ViewportToWorldPoint(new Vector3(0f, 0f, zOffset));
+            Vector3 topRight = _mainCamera.ViewportToWorldPoint(new Vector3(1f, 1f, zOffset));
+
+            if (_hasBounds &&
+                ApproximatelyEqual(bottomLeft, _cachedBottomLeft) &&
+                ApproximatelyEqual(topRight, _cachedTopRight))
+            {
+                return;
+            }
+
+            _cachedBottomLeft = bottomLeft;
+            _cachedTopRight = topRight;
+            _minBounds = new Vector2(bottomLeft.x, bottomLeft.y);
+            _maxBounds = new Vector2(topRight.x, topRight.y);
+            _hasBounds = true;
+        }
+
+        private static bool ApproximatelyEqual(Vector3 a, Vector3 b)
+        {
+            return Vector3.SqrMagnitude(a - b) <= 0.0001f;
         }
     }
 }
